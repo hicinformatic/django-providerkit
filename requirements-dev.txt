@@ -1,0 +1,14 @@
+# Development dependencies
+# Install qualitybase and providerkit in editable mode for local development
+-e .
+-e ../python-qualitybase
+-e ../python-providerkit
+-e ../django-virtualqueryset
+-e ../django-admin-boost
+
+# Include production dependencies
+Django>=3.2
+django-stubs>=5.0.0
+python-dotenv>=1.0
+pytest>=8.3
+pytest-django>=4.5

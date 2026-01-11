@@ -1,0 +1,6 @@
+# Production dependencies
+Django>=3.2
+django-admin-boost>=0.1.0
+django-virtualqueryset>=0.1.0
+providerkit>=0.2.0
+
