@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django_admin_boost import AdminBoostModel
+from django_boosted import AdminBoostModel
 from qualitybase.services.utils import snake_to_camel
 
 

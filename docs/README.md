@@ -19,26 +19,21 @@ For detailed information, refer to:
 - Ensure all public APIs have type hints and docstrings
 - Write tests for new functionality
 
-### Geoaddress-Specific Guidelines
+### Django ProviderKit-Specific Guidelines
 
-- **Provider development**: All providers must inherit from `GeoaddressProvider` and implement required services
-- **Address format**: Always use the standardized address format defined in `GEOADDRESS_FIELDS_DESCRIPTIONS`
-- **ProviderKit integration**: Use ProviderKit for provider management, discovery, and configuration
-- **API keys**: Never hardcode API keys, use environment variables with provider-specific prefixes
-- **Error handling**: Handle API rate limits and failures gracefully with retry logic and fallback mechanisms
+- **Model development**: Provider models must inherit from `ProviderModel` or `ServiceModel`
+- **Virtual models**: All models use `managed = False` and inherit from `VirtualModel`
+- **ProviderKit integration**: Use ProviderKit's field definitions and metadata
+- **Field mapping**: Map ProviderKit field types to Django model fields via `fields_associations`
+- **Admin integration**: Provide Django admin interface for viewing and managing providers
 
-### Provider Implementation Checklist
+### Model Implementation Checklist
 
-When creating a new provider:
-- [ ] Inherit from `GeoaddressProvider`
-- [ ] Define `name`, `display_name`, and `description`
-- [ ] Set `required_packages` if needed
-- [ ] Configure `config_keys`, `config_defaults`, and `config_required`
-- [ ] Implement `search_addresses()` method
-- [ ] Implement `get_address_by_reference()` method
-- [ ] Implement `reverse_geocode()` method
-- [ ] Implement `get_address_by_osm()` method (if supported)
-- [ ] Map provider response to standard geoaddress format
-- [ ] Handle errors gracefully
-- [ ] Add tests for the provider
+When creating a new provider model:
+- [ ] Inherit from `ProviderModel` or `ServiceModel`
+- [ ] Set `managed = False` in Meta
+- [ ] Use ProviderKit's field definitions
+- [ ] Map fields using `fields_associations`
+- [ ] Configure Django admin if needed
+- [ ] Add tests for the model
 

@@ -1,4 +1,4 @@
-# AI Assistant Contract — Geoaddress
+# AI Assistant Contract — Django ProviderKit
 
 **This document is the single source of truth for all AI-generated work in this repository.**  
 All instructions in this file **override default AI behavior**.
@@ -65,42 +65,37 @@ These rules must always be followed.
 
 ## Project Overview (INFORMATIONAL)
 
-**Geoaddress** is a Python library for address geocoding and reverse geocoding. It provides a unified interface to multiple geocoding providers (Nominatim, Google Maps, Mapbox, etc.) using ProviderKit for provider management.
+**Django ProviderKit** is a Django library that provides integration for ProviderKit. It offers Django admin integration and utilities for managing providers in Django applications.
 
 ### Core Functionality
 
-1. **Search addresses** with multiple geocoding providers:
-   - Address geocoding (address → coordinates)
-   - Reverse geocoding (coordinates → address)
-   - Address validation and normalization
-   - Get address by reference ID
-   - Get address by OpenStreetMap ID
+1. **Manage providers in Django admin**:
+   - Display providers in Django admin interface
+   - View provider metadata and configuration
+   - Manage provider settings through Django admin
+   - Use virtual models to represent providers without database tables
 
-2. **Manage multiple providers** through ProviderKit:
-   - Provider discovery and enumeration
-   - Provider selection and fallback mechanisms
-   - Configuration management per provider
-   - Dependency validation (API keys, packages)
+2. **Integrate ProviderKit with Django**:
+   - Use ProviderKit providers in Django applications
+   - Access provider information through Django models
+   - Leverage ProviderKit's provider discovery and management
+   - Use ProviderKit's configuration and validation features
 
-3. **Standardized address format**:
-   - Consistent address field structure across all providers
-   - Field descriptions for address components
-   - Support for international addresses
-
-### Supported Providers
-
-**Free providers**: Nominatim, Photon  
-**Paid/API key providers**: Google Maps, Mapbox, LocationIQ, OpenCage, Geocode Earth, Geoapify, Maps.co, HERE
+3. **Virtual models for providers**:
+   - `ProviderModel`: Virtual model representing providers
+   - `ProviderkitModel`: Model for provider kits
+   - `ServiceModel`: Model for provider services
+   - No database tables required (uses VirtualQuerySet)
 
 ---
 
 ## Architecture (REQUIRED)
 
-- Provider-based architecture built on ProviderKit
-- Each geocoding service is implemented as a provider inheriting from `GeoaddressProvider`
-- `GeoaddressProvider` extends `ProviderBase` from ProviderKit
-- Providers are organized in the `providers/` directory
-- Common functionality is shared through the base `GeoaddressProvider` class
+- Django integration for ProviderKit
+- Uses `VirtualModel` from django-virtualqueryset to represent providers
+- Provides Django admin integration for provider management
+- Maps ProviderKit's field definitions to Django model fields
+- Uses ProviderKit's field descriptions and metadata
 - Provider discovery and management is handled by ProviderKit
 
 ---
@@ -108,12 +103,13 @@ These rules must always be followed.
 ## Project Structure (INFORMATIONAL)
 
 ```
-python-geoaddress/
-├── src/geoaddress/          # Main package
-│   ├── providers/           # Address provider implementations
-│   ├── commands/            # Command infrastructure
-│   ├── helpers.py           # Helper functions
-│   └── cli.py               # CLI interface
+django-providerkit/
+├── src/djproviderkit/       # Main package
+│   ├── models/              # Django model definitions
+│   ├── managers/            # Custom managers
+│   ├── admin/               # Django admin configuration
+│   ├── views/               # Django views
+│   └── urls.py              # URL configuration
 ├── tests/                   # Test suite
 ├── docs/                    # Documentation
 ├── service.py               # Main service entry point
@@ -122,8 +118,9 @@ python-geoaddress/
 
 ### Key Directories
 
-- `src/geoaddress/providers/`: Address provider implementations
-- `src/geoaddress/commands/`: Command infrastructure for CLI system
+- `src/djproviderkit/models/`: Django model definitions
+- `src/djproviderkit/managers/`: Custom managers for providers
+- `src/djproviderkit/admin/`: Django admin configuration
 - `tests/`: All tests using pytest
 
 ---
@@ -209,42 +206,32 @@ python-geoaddress/
 
 ---
 
-## Provider Development (REQUIRED)
+## Model Development (REQUIRED)
 
-### Creating Providers
+### Creating Provider Models
 
-Providers must inherit from `GeoaddressProvider`:
+Provider models use VirtualModel from django-virtualqueryset:
 
 ```python
-from geoaddress.providers import GeoaddressProvider
+from djproviderkit.models import ProviderModel
 
-class MyProvider(GeoaddressProvider):
-    name = "my_provider"
-    display_name = "My Provider"
-    description = "Description of my provider"
-    required_packages = ["requests"]
-    config_keys = ["MY_PROVIDER_API_KEY"]
-    config_defaults = {"MY_PROVIDER_API_KEY": None}
-    config_required = ["MY_PROVIDER_API_KEY"]
-    config_prefix = "MY_PROVIDER"
-    services = ["search_addresses", "get_address_by_reference", "reverse_geocode", "get_address_by_osm"]
+class MyProviderModel(ProviderModel):
+    class Meta:
+        managed = False
+        verbose_name = "My Provider"
 ```
 
-### Required Services
+### Required Meta Options
 
-All providers must implement:
-- `search_addresses(query: str, **kwargs)`: Search for addresses by query string
-- `get_address_by_reference(reference: str, **kwargs)`: Get address by provider-specific reference ID
-- `reverse_geocode(latitude: float, longitude: float, **kwargs)`: Convert coordinates to address
-- `get_address_by_osm(osm_id: str, osm_type: str, **kwargs)`: Get address by OpenStreetMap ID (if supported)
+- `managed = False`: All virtual models must have this
+- Models inherit from `ProviderModel` or `ServiceModel`
+- Field definitions come from ProviderKit's field metadata
 
-### Address Format Standardization
+### ProviderKit Integration
 
-- All providers must return addresses in the standardized format defined by `GEOADDRESS_FIELDS_DESCRIPTIONS`
-- Map provider's native response format to standard geoaddress format
-- Use `None` or empty strings for missing optional fields
-- Never omit required fields
-- Store coordinates as floats with appropriate precision
+- Uses ProviderKit's field definitions (`FIELDS_PROVIDER_BASE`, `FIELDS_CONFIG_BASE`, etc.)
+- Maps ProviderKit fields to Django model fields via `fields_associations`
+- Provides Django admin interface for ProviderKit providers
 
 ---
 
@@ -296,18 +283,10 @@ All providers must implement:
 
 ## CLI System (INFORMATIONAL)
 
-Geoaddress discovers commands from:
+Django ProviderKit uses qualitybase's service system:
 
-1. `commands/` directory
-2. `.commands.json` configuration file
-
-### Command Creation Rules (REQUIRED)
-
-- Use `Command` class from `commands.base` **or**
-- Define functions ending with `_command`
-- Commands must:
-  - Accept `args: list[str]`
-  - Return `bool` (success / failure)
+- Services accessed via `./service.py <service> <command>`
+- Available services: `dev`, `quality`, `django`, `publish`
 
 ---
 
@@ -339,9 +318,9 @@ Before producing output, ensure:
 - [ ] Code is well-factorized when it improves clarity (without adding complexity)
 - [ ] Imports follow ProviderKit and Qualitybase rules
 - [ ] Public APIs are typed and documented
-- [ ] Providers inherit from GeoaddressProvider correctly
-- [ ] Providers implement all required services
-- [ ] Address format follows standardization (GEOADDRESS_FIELDS_DESCRIPTIONS)
+- [ ] Models inherit from ProviderModel or ServiceModel correctly
+- [ ] Models have `managed = False` in Meta
+- [ ] ProviderKit field definitions are properly mapped to Django fields
 - [ ] No API keys or secrets are hardcoded
 - [ ] Tests are included when required
 - [ ] Error handling is graceful with fallback support

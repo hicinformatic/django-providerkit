@@ -1,4 +1,4 @@
-"""URL configuration for testing django-geoaddress."""
+"""URL configuration for testing django-providerkit."""
 
 from django.contrib import admin
 from django.urls import path, include
@@ -10,6 +10,6 @@ urlpatterns = [
     path("djproviderkit/", include("djproviderkit.urls")),
 ]
 
-# admin.site.site_header = "Django GeoAddress - Administration"
-# admin.site.site_title = "Django GeoAddress Admin"
-# admin.site.index_title = "Welcome to Django GeoAddress"
+# admin.site.site_header = "Django ProviderKit - Administration"
+# admin.site.site_title = "Django ProviderKit Admin"
+# admin.site.index_title = "Welcome to Django ProviderKit"

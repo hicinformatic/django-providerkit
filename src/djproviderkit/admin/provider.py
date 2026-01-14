@@ -1,4 +1,4 @@
-from django_admin_boost import AdminBoostModel
+from django_boosted import AdminBoostModel
 from providerkit.kit import FIELDS_PROVIDER_BASE
 from providerkit.kit.config import FIELDS_CONFIG_BASE
 from providerkit.kit.package import FIELDS_PACKAGE_BASE

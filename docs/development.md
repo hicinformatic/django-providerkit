@@ -38,20 +38,19 @@
 - **Standard library imports**: Use `importlib.import_module()` from the standard library if needed for dynamic imports
 - **Works everywhere**: Since providerkit is installed in the virtual environment, imports work consistently across all projects
 
-### Provider Development
+### Model Development
 
-- **Provider inheritance**: All providers must inherit from `GeoaddressProvider` (which extends `ProviderBase` from ProviderKit)
-- **Required attributes**: Providers must define `name`, `display_name`, and optionally `description`
-- **Service implementation**: Providers must implement the required services: `search_addresses`, `get_address_by_reference`, `reverse_geocode`, `get_address_by_osm`
-- **Configuration**: Use `config_keys`, `config_defaults`, and `config_required` for provider configuration
-- **API keys**: Never hardcode API keys, use environment variables with the provider's `config_prefix`
+- **Model inheritance**: Provider models must inherit from `ProviderModel` or `ServiceModel`
+- **Meta.managed = False**: All virtual models must have `managed = False` in Meta
+- **Field mapping**: Use `fields_associations` to map ProviderKit field types to Django model fields
+- **ProviderKit integration**: Models use ProviderKit's field definitions and metadata
 
-### Address Format Standardization
+### ProviderKit Integration
 
-- **Consistent fields**: All providers must return addresses in the standardized format defined by `GEOADDRESS_FIELDS_DESCRIPTIONS`
-- **Field mapping**: Each provider should map its native response format to the standard geoaddress format
-- **Missing fields**: Use `None` or empty strings for missing optional fields, never omit required fields
-- **Coordinate precision**: Store coordinates as floats with appropriate precision
+- **Field definitions**: Use ProviderKit's field definitions (`FIELDS_PROVIDER_BASE`, `FIELDS_CONFIG_BASE`, etc.)
+- **Field associations**: Map ProviderKit field types to Django model fields via `fields_associations`
+- **Virtual models**: Use VirtualQuerySet to represent providers without database tables
+- **Admin integration**: Provide Django admin interface for ProviderKit providers
 
 ### Error Handling
 

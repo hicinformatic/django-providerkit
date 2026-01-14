@@ -1,4 +1,4 @@
-"""Django settings for testing django-geoaddress."""
+"""Django settings for testing django-providerkit."""
 
 import os
 from pathlib import Path
@@ -21,7 +21,7 @@ def _env(key: str, default: str = "") -> str:
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY", "test-secret-key-for-django-geoaddress")
+SECRET_KEY = os.getenv("SECRET_KEY", "test-secret-key-for-django-providerkit")
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
@@ -79,7 +79,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django ProviderKit configuration
 ROOT_URLCONF = "tests.urls"
 INSTALLED_APPS += [
-    "django_admin_boost",
+    "django_boosted",
     "django_extensions",
     "djproviderkit", 
 ]
