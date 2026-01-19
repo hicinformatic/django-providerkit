@@ -5,14 +5,13 @@ from qualitybase.services.utils import snake_to_camel
 from djproviderkit import models
 from djproviderkit.models import ProviderkitModel
 
-from .provider import ProviderAdmin
+from .provider import BaseProviderAdmin
 from .service import create_service_provider_admin
 
 
 @admin.register(ProviderkitModel)
-class ProviderkitAdmin(ProviderAdmin):
+class ProviderkitAdmin(BaseProviderAdmin):
     """Admin for providerkit model."""
-
 
 services_admins = []
 for svc, cfg in ProviderListBase.services_cfg.items():
@@ -25,4 +24,4 @@ for svc, cfg in ProviderListBase.services_cfg.items():
         services_admins.append(adm)
         globals()[str(adm.__name__)] = adm
 
-__all__ = ['ProviderAdmin', 'ProviderkitAdmin', *[str(adm.__name__) for adm in services_admins]]
+__all__ = ['BaseProviderAdmin', 'ProviderkitAdmin', *[str(adm.__name__) for adm in services_admins]]

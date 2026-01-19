@@ -20,9 +20,3 @@ class BaseProviderManager(VirtualManager):
             providers = list(providers.values())
 
         return list(providers)
-
-
-class ProviderManager(BaseProviderManager):
-    """Manager for ProviderModel."""
-
-    pass
