@@ -84,6 +84,7 @@ class BaseProviderAdmin(AdminBoostModel):
         return fields
 
     def change_fieldsets(self):
-        self.add_to_fieldset('Config', list(FIELDS_CONFIG_BASE.keys()))
-        self.add_to_fieldset('Packages', list(FIELDS_PACKAGE_BASE.keys()))
-        self.add_to_fieldset('Services', list(FIELDS_SERVICE_BASE.keys()))
+        pass
+        # self.add_to_fieldset('Config', list(FIELDS_CONFIG_BASE.keys()))
+        # self.add_to_fieldset('Packages', list(FIELDS_PACKAGE_BASE.keys()))
+        # self.add_to_fieldset('Services', list(FIELDS_SERVICE_BASE.keys()))

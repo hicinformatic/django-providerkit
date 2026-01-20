@@ -22,6 +22,7 @@ class ProviderkitModel(VirtualModel):
     objects = BaseProviderManager()
 
     class Meta:
+        app_label = 'djproviderkit'
         managed = False
         verbose_name = _('Provider')
         verbose_name_plural = _('Providers')

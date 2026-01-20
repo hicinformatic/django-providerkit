@@ -6,8 +6,6 @@ from django.db import models
 
 __version__ = '0.1.3'
 
-default_app_config = 'djproviderkit.apps.DjProviderkitConfig'
-
 
 fields_associations = {
     'int': models.IntegerField,
