@@ -6,6 +6,8 @@ from providerkit.kit.config import FIELDS_CONFIG_BASE
 from providerkit.kit.package import FIELDS_PACKAGE_BASE
 from providerkit.kit.service import FIELDS_SERVICE_BASE
 
+
+#FIELDS_SERVICE_BASE_CUSTOM = {key: value for key, value in FIELDS_PROVIDER_BASE.items() if key not in ['display_name', 'name', 'description']}
 FIELDS_PROVIDERKIT = {
     **FIELDS_PROVIDER_BASE,
     **FIELDS_CONFIG_BASE,
@@ -13,7 +15,9 @@ FIELDS_PROVIDERKIT = {
     **FIELDS_SERVICE_BASE,
 }
 
-list_display = list(FIELDS_PROVIDER_BASE.keys())
+
+list_display = ['admin_display_name']
+list_display += list(FIELDS_PROVIDER_BASE.keys())[3:]
 list_display.append(list(FIELDS_CONFIG_BASE.keys())[-1])
 list_display.append(list(FIELDS_PACKAGE_BASE.keys())[-1])
 list_display.append(list(FIELDS_SERVICE_BASE.keys())[-1])
@@ -78,13 +82,17 @@ class BaseProviderAdmin(AdminBoostModel):
             for field in self.model.has_service_fields:
                 if field not in fields:
                     fields.append(field)
-                cost_field = field.replace("has(", "cost(")
+                cost_field = field.replace("has_", "")
+                cost_field = f"{cost_field}_cost"
                 if cost_field in self.model.cost_service_fields and cost_field not in fields:
                     fields.append(cost_field)
         return fields
 
+    def admin_display_name(self, obj):
+        return self.format_with_help_text(obj.display_name, obj.description)
+
     def change_fieldsets(self):
-        pass
-        # self.add_to_fieldset('Config', list(FIELDS_CONFIG_BASE.keys()))
-        # self.add_to_fieldset('Packages', list(FIELDS_PACKAGE_BASE.keys()))
-        # self.add_to_fieldset('Services', list(FIELDS_SERVICE_BASE.keys()))
+        self.add_to_fieldset('Config', list(FIELDS_CONFIG_BASE.keys()))
+        self.add_to_fieldset('Packages', list(FIELDS_PACKAGE_BASE.keys()))
+        self.add_to_fieldset('Services', list(FIELDS_SERVICE_BASE.keys()))
+        self.add_to_fieldset('Cost', ['costs_services'])

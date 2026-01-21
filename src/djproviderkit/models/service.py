@@ -54,6 +54,26 @@ def define_provider_fields(primary_key="id"):
                 verbose_name=value['label'], help_text=value['description']
             )
             cls.add_to_class(field, db_field)
+
+        @property
+        def _provider(self):
+            """Get the original provider from the manager."""
+            if hasattr(self.__class__.objects, '_providers_by_name'):
+                return self.__class__.objects._providers_by_name.get(self.name)
+            return None
+
+        cls.add_to_class("_provider", _provider)
+
+        @property
+        def costs_services(self):
+            """Get costs for all services."""
+            provider = self._provider if self._provider else self
+            if hasattr(provider, 'get_costs_services'):
+                return provider.get_costs_services()
+            return {}
+
+        cls.add_to_class("costs_services", costs_services)
+
         return cls
     return decorator
 
@@ -78,27 +98,30 @@ def define_service_fields(services: list[str]):
         for service in services:
             def make_has_service(svc: str):
                 def has_service(self):
-                    if not self.services or svc not in self.services:
-                        return False
-                    missing = self.missing_services or []
-                    return svc not in missing
+                    provider = self._provider if self._provider else self
+                    if hasattr(provider, svc) and callable(getattr(provider, svc)):
+                        return True
+                    return False
 
                 return ServiceProperty(has_service, f"Has {svc}", boolean=True)
 
             def make_cost_service(svc: str):
                 def cost_service(self):
-                    cost = getattr(self, f"cost_{svc}", None)
-                    if cost is None or cost == 0 or cost == "free":
-                        return "-"
-                    return f"${cost:.5f}"
+                    provider = self._provider if self._provider else self
+                    if hasattr(provider, 'get_cost'):
+                        cost = provider.get_cost(svc)
+                        if cost in (None, 0, 'free'):
+                            return "-"
+                        return f"${cost:.5f}"
+                    return "-"
 
                 return ServiceProperty(cost_service, f"Cost {svc}")
 
-            fields_service.append(f"has({service})")
-            cls.add_to_class(f"has({service})", make_has_service(service))
+            fields_service.append(f"has_{service}")
+            cls.add_to_class(f"has_{service}", make_has_service(service))
 
-            fields_cost.append(f"cost({service})")
-            cls.add_to_class(f"cost({service})", make_cost_service(service))
+            fields_cost.append(f"{service}_cost")
+            cls.add_to_class(f"{service}_cost", make_cost_service(service))
 
         cls.add_to_class("has_service_fields", fields_service)
         cls.add_to_class("cost_service_fields", fields_cost)
