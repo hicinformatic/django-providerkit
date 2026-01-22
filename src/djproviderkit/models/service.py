@@ -45,7 +45,7 @@ def create_service_provider_model(name, fields, app_label, field_id):
     return type(model_name, (ServiceProviderModel,), attrs)
 
 
-def define_provider_fields(primary_key="id"):
+def define_provider_fields(primary_key="id", add_fields=None):
     def decorator(cls):
         for field, value in FIELDS_PROVIDERKIT.items():
             if field == primary_key:
@@ -73,6 +73,13 @@ def define_provider_fields(primary_key="id"):
             return {}
 
         cls.add_to_class("costs_services", costs_services)
+
+        if add_fields:
+            for field, value in add_fields.items():
+                db_field = fields_associations[value['format']](
+                    verbose_name=value['label'], help_text=value['description']
+                )
+                cls.add_to_class(field, db_field)
 
         return cls
     return decorator

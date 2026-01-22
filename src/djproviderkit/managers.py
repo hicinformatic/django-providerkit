@@ -8,7 +8,7 @@ class BaseProviderManager(VirtualManager):
     """Base manager for provider models."""
 
     package_name = 'providerkit'
-    _providers_by_name = {}  # Cache des providers par name
+    _providers_by_name = {}  # Cache providers by name
 
     def get_data(self) -> list[Any]:
         if not self.model:
@@ -20,7 +20,7 @@ class BaseProviderManager(VirtualManager):
         if isinstance(providers, dict):
             providers = list(providers.values())
 
-        # Stocker les providers dans le cache du manager
+        # Store providers in manager cache
         self._providers_by_name.clear()
         for provider in providers:
             self._providers_by_name[provider.name] = provider
