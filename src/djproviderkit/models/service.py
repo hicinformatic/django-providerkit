@@ -25,6 +25,7 @@ class ServiceProviderModel(models.Model):
 
 
 def create_service_provider_model(name, fields, app_label, field_id):
+    """Create a service provider model."""
     attrs = {
         '__module__': __name__,
         'Meta': type('Meta', (), {'app_label': app_label}),
@@ -46,6 +47,7 @@ def create_service_provider_model(name, fields, app_label, field_id):
 
 
 def define_provider_fields(primary_key="id", add_fields=None):
+    """Decorator to automatically add provider fields to a model."""
     def decorator(cls):
         for field, value in FIELDS_PROVIDERKIT.items():
             if field == primary_key:
@@ -99,6 +101,7 @@ class ServiceProperty:
 
 
 def define_service_fields(services: list[str]):
+    """Decorator to automatically add service fields to a model."""
     def decorator(cls):
         fields_service = []
         fields_cost = []
@@ -132,5 +135,34 @@ def define_service_fields(services: list[str]):
 
         cls.add_to_class("has_service_fields", fields_service)
         cls.add_to_class("cost_service_fields", fields_cost)
+        return cls
+    return decorator
+
+
+def define_fields_from_config(fields_config: dict, primary_key: str | None = None):
+    """Decorator to automatically add fields to a model from a fields configuration."""
+    def decorator(cls):
+        for field, value in fields_config.items():
+            if field == primary_key:
+                continue
+
+            db_field = fields_associations[value['format']](
+                verbose_name=value['label'], help_text=value['description']
+            )
+
+            if value['format'] in ('str', 'text'):
+                db_field.blank = True
+                if value['format'] == 'text':
+                    db_field.max_length = None
+                elif 'reference' in field or 'id' in field:
+                    db_field.max_length = 255
+                else:
+                    db_field.max_length = 500
+            elif value['format'] == 'float':
+                db_field.null = True
+                db_field.blank = True
+
+            cls.add_to_class(field, db_field)
+
         return cls
     return decorator
