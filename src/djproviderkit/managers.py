@@ -35,7 +35,7 @@ class BaseServiceProviderManager(VirtualManager):
     def __init__(self, **kwargs: Any):
         super().__init__()
         for arg in self._args_available:
-            setattr(self, arg, kwargs.get(arg, None)) 
+            setattr(self, arg, kwargs.get(arg))
         self._command = kwargs.get("command", self._default_command)
         self._cached_providers = {}
         self._cached_data_search_company = {}
@@ -68,6 +68,14 @@ class BaseServiceProviderManager(VirtualManager):
                 else:
                     data_list.append(normalize_data)
         return data_list
+
+    def get_response_times(self, command: str) -> dict[str, float]:
+        times = self._cached_providers.get(command, [])
+        return {provider["name"]: provider["response_time"] for provider in times}
+
+    def get_raw_result(self, command: str, **_kwargs: Any) -> Any:
+        raw = self._cached_providers.get(command, {})
+        return raw
 
     def get_queryset_command(self, command: str, **kwargs: Any) -> Any:
         cached = self.get_cached_command(command)

@@ -1,7 +1,7 @@
 from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
 from django_boosted import AdminBoostModel
 from qualitybase.services.utils import snake_to_camel
-from django.utils.translation import gettext_lazy as _
 
 
 class BaseServiceAdminFilter(admin.SimpleListFilter):
@@ -19,6 +19,7 @@ class BaseServiceAdminFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):  # noqa: ARG002
         return queryset
 
+
 class FirstServiceAdminFilter(BaseServiceAdminFilter):
     """Filter for first service model."""
     title = _("First")
@@ -33,21 +34,21 @@ class FirstServiceAdminFilter(BaseServiceAdminFilter):
 
     def queryset(self, request, queryset):  # noqa: ARG002
         return queryset
-    
- 
+
+
 class BackendServiceAdminFilter(BaseServiceAdminFilter):
     title = _("Backend")
     parameter_name = "bck"
     provider_model = None
 
-    def lookups(self, request, model_admin):
+    def lookups(self, request, model_admin):  # noqa: ARG002
         if self.provider_model:
             providers = self.provider_model.objects.get_queryset()
             return [(provider.name, provider.display_name) for provider in providers]
         return []
 
-    def queryset(self, request, queryset):
-        setattr(queryset, "backend", self.value())
+    def queryset(self, request, queryset):  # noqa: ARG002
+        queryset.backend = self.value()
         return queryset
 
 

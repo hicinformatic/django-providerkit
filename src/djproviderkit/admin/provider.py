@@ -6,7 +6,6 @@ from providerkit.kit.config import FIELDS_CONFIG_BASE
 from providerkit.kit.package import FIELDS_PACKAGE_BASE
 from providerkit.kit.service import FIELDS_SERVICE_BASE
 
-
 #FIELDS_SERVICE_BASE_CUSTOM = {key: value for key, value in FIELDS_PROVIDER_BASE.items() if key not in ['display_name', 'name', 'description']}
 FIELDS_PROVIDERKIT = {
     **FIELDS_PROVIDER_BASE,

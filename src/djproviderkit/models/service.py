@@ -109,9 +109,7 @@ def define_service_fields(services: list[str]):
             def make_has_service(svc: str):
                 def has_service(self):
                     provider = self._provider if self._provider else self
-                    if hasattr(provider, svc) and callable(getattr(provider, svc)):
-                        return True
-                    return False
+                    return hasattr(provider, svc) and callable(getattr(provider, svc))
 
                 return ServiceProperty(has_service, f"Has {svc}", boolean=True)
 
