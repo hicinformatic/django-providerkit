@@ -19,4 +19,5 @@ fields_associations = {
     'datetime': models.DateTimeField,
     'email': models.EmailField,
     'url': models.URLField,
+    'json': models.JSONField,
 }
