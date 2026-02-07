@@ -21,3 +21,7 @@ fields_associations = {
     'url': models.URLField,
     'json': models.JSONField,
 }
+
+from .fields import ProviderField
+
+__all__ = ['ProviderField']
