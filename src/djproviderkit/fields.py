@@ -7,6 +7,67 @@ from django.utils.translation import gettext_lazy as _
 from providerkit.helpers import get_providerkit
 
 
+class ProviderValue:
+    """Wrapper around provider name string that adds _provider attribute."""
+
+    def __init__(self, value: str, package_name: str | None):
+        self._value = value
+        self._package_name = package_name
+        self._provider_instance = None
+
+    def __str__(self) -> str:
+        return str(self._value)
+
+    def __repr__(self) -> str:
+        return repr(self._value)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, ProviderValue):
+            return self._value == other._value
+        return self._value == other
+
+    def __hash__(self) -> int:
+        return hash(self._value)
+
+    @property
+    def _provider(self):
+        """Get the provider instance."""
+        if self._provider_instance is None:
+            try:
+                pvk = get_providerkit()
+                providers = pvk.get_providers(lib_name=self._package_name)
+                if isinstance(providers, dict):
+                    providers = providers.values()
+                for provider in providers:
+                    if provider.name == self._value:
+                        self._provider_instance = provider
+                        break
+            except Exception:
+                pass
+        return self._provider_instance
+
+
+class ProviderDescriptor:
+    """Descriptor that wraps field value with ProviderValue."""
+
+    def __init__(self, field, package_name: str | None):
+        self.field = field
+        self.package_name = package_name
+
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        value = instance.__dict__.get(self.field.attname, None)
+        if not value:
+            return value
+        return ProviderValue(value, self.package_name)
+
+    def __set__(self, instance, value):
+        if hasattr(value, '_value'):
+            value = value._value
+        instance.__dict__[self.field.attname] = value
+
+
 class ProviderField(models.CharField):
     """
     CharField storing a provider name, with dynamic choices
@@ -22,6 +83,11 @@ class ProviderField(models.CharField):
         kwargs.setdefault("help_text", _("Select a provider"))
 
         super().__init__(*args, **kwargs)
+
+    def contribute_to_class(self, cls, name, **kwargs):
+        """Add custom descriptor to provide _provider access."""
+        super().contribute_to_class(cls, name, **kwargs)
+        setattr(cls, name, ProviderDescriptor(self, self.package_name))
 
     def formfield(self, **kwargs):
         """
@@ -57,3 +123,5 @@ class ProviderField(models.CharField):
             pass
 
         return choices
+
+
