@@ -39,7 +39,7 @@ class ProviderValue:
                 if isinstance(providers, dict):
                     providers = providers.values()
                 for provider in providers:
-                    if provider.name == self._value:
+                    if self._value in [provider.name, provider.display_name]:
                         self._provider_instance = provider
                         break
             except Exception:
