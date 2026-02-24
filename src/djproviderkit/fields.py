@@ -46,6 +46,10 @@ class ProviderValue:
                 pass
         return self._provider_instance
 
+    def call_service(self, service_name: str, **kwargs):
+        """Call a service on the provider."""
+        return self._provider.call_service_formatted(service_name, **kwargs)
+
 
 class ProviderDescriptor:
     """Descriptor that wraps field value with ProviderValue."""

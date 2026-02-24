@@ -20,6 +20,7 @@ fields_associations = {
     'email': models.EmailField,
     'url': models.URLField,
     'json': models.JSONField,
+    'dict': models.JSONField,
 }
 
 from .fields import ProviderField

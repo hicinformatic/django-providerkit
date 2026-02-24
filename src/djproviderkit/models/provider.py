@@ -5,7 +5,7 @@ from virtualqueryset.models import VirtualModel
 
 from djproviderkit.managers import BaseProviderManager
 
-from .service import define_provider_fields, define_service_fields
+from .define import define_provider_fields, define_service_fields
 
 services = list(ProviderListBase.services_cfg.keys())
 

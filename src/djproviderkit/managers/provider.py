@@ -10,6 +10,10 @@ class BaseProviderManager(VirtualManager):
     package_name = 'providerkit'
     _providers_by_name = {}  # Cache providers by name
 
+    def __init__(self, *args, **kwargs):
+        self.package_name = kwargs.pop('package_name', 'providerkit')
+        super().__init__(*args, **kwargs)
+
     def get_data(self) -> list[Any]:
         if not self.model:
             return []
